@@ -10,7 +10,7 @@ export default class VNode {
     this.componentOptions = componentOptions;
     this.key = key;
     this.parent = parent;
-    this.componenetInstance = undefined;
+    this.componentInstance = undefined;
   }
 }
 

@@ -8,7 +8,6 @@ export default function createElement(context, tag, data, children) {
   if(Array.isArray(data)) { 
     children = data 
     data = undefined
-    console.log(children,'是你吧')
   }
   return _createElement(context, tag, data, children)
 }
@@ -31,7 +30,8 @@ export function _createElement(context,tag,data,children) {
     // _compiled: true
     // __file: "examples/word/App.vue"
     // __proto__: Object
-    vnode = createComponent(tag,context)
+    let Ctor = tag 
+    vnode = createComponent(Ctor,context)
     console.log(vnode,"创建组件节点")
   } 
 

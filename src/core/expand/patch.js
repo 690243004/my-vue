@@ -2,7 +2,7 @@ import Vue from "../index";
 import { isDef, isUndef } from "../../shared/util";
 import nodeOps from "../dom/nodeOps";
 import VNode from "../vdom/vnode";
-const { createElement,createTextNode } = nodeOps;
+const { createElement, createTextNode } = nodeOps;
 
 function insert(parent, elm, ref) {
   if (isDef(parent)) {
@@ -14,33 +14,56 @@ function insert(parent, elm, ref) {
   }
 }
 
-function createChildren(vnode,children,insertedVnodeQueue) { 
-  if(Array.isArray(children)) { 
-    children.forEach((child,i)=> { 
-      createElm(child,insertedVnodeQueue,vnode.elm,null,true,children,i)
-    })
+function createChildren(vnode, children, insertedVnodeQueue) {
+  if (Array.isArray(children)) {
+    children.forEach((child, i) => {
+      createElm(child, insertedVnodeQueue, vnode.elm, null, true, children, i);
+    });
   }
 }
 
-function createComponent(vnode,insertedVnodeQueue,parentElm,refElm) { 
-  if(vnode.componentOptions) { 
-    const options = vnode.componentOptions.Ctor.options
-    options.el = parentElm
-    return new vnode.componentOptions.Ctor(options)
-  }
+var activeInstance;
 
+function init(vnode) {
+  const child = (vnode.componentInstance = createComponentInstanceForVnode(
+    vnode,
+    activeInstance
+  ));
+  child.$mount();
 }
 
+function createComponentInstanceForVnode(vnode, parent) {
+  const options = {
+    _isComponent: true,
+    _parentVnode: vnode,
+    parent
+  };
+  return new vnode.componentOptions.Ctor(options);
+}
+
+function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
+  init(vnode)
+  if(vnode.componentInstance) { 
+    insert(parentElm, vnode.elm, refElm)
+    return true 
+  }
+  // if (vnode.componentOptions) {
+  //   const options = vnode.componentOptions.Ctor.options;
+  //   options.el = parentElm;
+  //   options._isComponent = true;
+  //   return new vnode.componentOptions.Ctor(options);
+  // }
+}
 
 /**
- * 
+ *
  * @param {*} vnode 对应的render返回的虚拟DOM
- * @param {*} insertedVnodeQueue 
- * @param {*} parentElm 
- * @param {*} refElm 
- * @param {*} nested 
- * @param {*} ownerArray 
- * @param {*} index 
+ * @param {*} insertedVnodeQueue
+ * @param {*} parentElm
+ * @param {*} refElm
+ * @param {*} nested
+ * @param {*} ownerArray
+ * @param {*} index
  */
 function createElm(
   vnode,
@@ -59,16 +82,16 @@ function createElm(
   const tag = vnode.tag;
 
   // 尝试渲染组件节点
-  if(createComponent(vnode,[],parentElm,refElm)) { 
-    return 
+  if (createComponent(vnode, [], parentElm, refElm)) {
+    return;
   }
 
   if (isDef(tag)) {
     // ...校验tag是否存在等逻辑
     vnode.elm = createElement(tag);
     // createChildren
-    createChildren(vnode, children, insertedVnodeQueue)
-  } else { 
+    createChildren(vnode, children, insertedVnodeQueue);
+  } else {
     vnode.elm = createTextNode(vnode.text);
   }
   insert(parentElm, vnode.elm);
@@ -90,7 +113,7 @@ Vue.prototype.__patch__ = function patch(oldVnode, vnode) {
   const oldElm = oldVnode.elm;
   // 获得oldVnode对应的真实DOM节点的父节点
   const parentElm = nodeOps.parentNode(oldElm);
-  console.log(parentElm)
+  console.log(parentElm);
   createElm(vnode, [], parentElm);
   return vnode.elm;
 };
