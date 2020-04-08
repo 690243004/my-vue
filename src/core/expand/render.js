@@ -5,8 +5,8 @@ import { createTextVNode } from '../vdom/vnode'
 Vue.prototype._render = function() { 
   console.log('3. MyVue : _render has been start')
   const vm = this 
-  const { render,_parentNode,staticRenderFns } = vm.$options 
-  vm.$vnode = _parentNode 
+  const { render,_parentVnode,staticRenderFns } = vm.$options 
+  vm.$vnode = _parentVnode 
   console.log(vm,'vm')
   let vnode 
   try{

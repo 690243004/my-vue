@@ -22,16 +22,21 @@ function createChildren(vnode, children, insertedVnodeQueue) {
   }
 }
 
-
+function initComponent(vnode) {
+  vnode.elm = vnode.componentInstance.$el;
+}
 
 function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
-  let i = vnode.data
-  if(isDef(i = i.hook) && isDef(i = i.init)) {
-    i(vnode)
+  let i = vnode.data;
+  if (isDef(i) && isDef((i = i.hook)) && isDef((i = i.init))) {
+    i(vnode);
   }
-  if(vnode.componentInstance) { 
-    insert(parentElm, vnode.elm, refElm)
-    return true 
+
+  if (vnode.componentInstance) {
+    debugger;
+    initComponent(vnode);
+    insert(parentElm, vnode.elm, refElm);
+    return true;
   }
   // if (vnode.componentOptions) {
   //   const options = vnode.componentOptions.Ctor.options;
@@ -80,7 +85,9 @@ function createElm(
   } else {
     vnode.elm = createTextNode(vnode.text);
   }
-  insert(parentElm, vnode.elm);
+  if (isDef(parentElm)) {
+    insert(parentElm, vnode.elm);
+  }
 }
 
 function emptyNodeAt(elm) {
@@ -90,16 +97,20 @@ function emptyNodeAt(elm) {
 Vue.prototype.__patch__ = function patch(oldVnode, vnode) {
   console.log("5. MyVue : __patch__ has been start");
   let isInitialPatch = false;
-
-  const isRealElement = isDef(oldVnode.nodeType);
-  if (isRealElement) {
-    // 初次渲染 会传入一个真实DOM 这里将真实DOM转为虚拟DOM
-    oldVnode = emptyNodeAt(oldVnode);
+  if (isUndef(oldVnode)) {
+    isInitialPatch = true;
+    createElm(vnode, []);
+  } else {
+    const isRealElement = isDef(oldVnode.nodeType);
+    if (isRealElement) {
+      // 初次渲染 会传入一个真实DOM 这里将真实DOM转为虚拟DOM
+      oldVnode = emptyNodeAt(oldVnode);
+    }
+    const oldElm = oldVnode.elm;
+    // 获得oldVnode对应的真实DOM节点的父节点
+    const parentElm = nodeOps.parentNode(oldElm);
+    console.log(parentElm);
+    createElm(vnode, [], parentElm);
   }
-  const oldElm = oldVnode.elm;
-  // 获得oldVnode对应的真实DOM节点的父节点
-  const parentElm = nodeOps.parentNode(oldElm);
-  console.log(parentElm);
-  createElm(vnode, [], parentElm);
   return vnode.elm;
 };

@@ -27,7 +27,6 @@ const componentVNodeHooks = {
       vnode,
       activeInstance
     ))
-    debugger
     child.$mount()
   },
 }

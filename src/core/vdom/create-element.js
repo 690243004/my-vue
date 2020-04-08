@@ -5,10 +5,6 @@ import createComponent from './create-component'
 // render会触发该方法
 export default function createElement(context, tag, data, children) {
   console.log("MyVue : createElement has been start", tag, data, children)
-  if(Array.isArray(data)) { 
-    children = data 
-    data = undefined
-  }
   return _createElement(context, tag, data, children)
 }
 
