@@ -7,7 +7,7 @@ Vue.prototype._render = function() {
   const vm = this 
   const { render,_parentNode,staticRenderFns } = vm.$options 
   vm.$vnode = _parentNode 
-
+  console.log(vm,'vm')
   let vnode 
   try{
     if(staticRenderFns && staticRenderFns.length > 0) { 

@@ -22,27 +22,13 @@ function createChildren(vnode, children, insertedVnodeQueue) {
   }
 }
 
-var activeInstance;
 
-function init(vnode) {
-  const child = (vnode.componentInstance = createComponentInstanceForVnode(
-    vnode,
-    activeInstance
-  ));
-  child.$mount();
-}
-
-function createComponentInstanceForVnode(vnode, parent) {
-  const options = {
-    _isComponent: true,
-    _parentVnode: vnode,
-    parent
-  };
-  return new vnode.componentOptions.Ctor(options);
-}
 
 function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
-  init(vnode)
+  let i = vnode.data
+  if(isDef(i = i.hook) && isDef(i = i.init)) {
+    i(vnode)
+  }
   if(vnode.componentInstance) { 
     insert(parentElm, vnode.elm, refElm)
     return true 

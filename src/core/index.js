@@ -17,10 +17,9 @@ Vue.prototype._init = function(options) {
   vm._self = vm;
   if (options._isComponent) {
     initInternalComponent(vm, options);
-  } else {
-    // 合并配置
-    vm.$options = Object.assign({}, options, vm);
-  }
+  } 
+  
+  vm.$options = Object.assign({}, options, vm);
   vm.data = vm._data = vm.$options.data;
   Object.keys(vm.data).forEach(key => {
     initProxy(vm, key);

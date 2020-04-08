@@ -1,6 +1,6 @@
-import Vue from "@s/index.js";
-import App from "./App.vue";
-console.log(App, "?App");
+import Vue from '@s/index.js'
+import App from './App.vue'
+console.log(App, '?App')
 /* const app = new Vue({
   el: document.getElementById("app"),
   render: function(createElement) {
@@ -32,13 +32,14 @@ console.log(App, "?App");
   }
 }); */
 const app = new Vue({
-  el: document.getElementById("app"),
-  render: function(h) { 
+  el: document.getElementById('app'),
+  render: function(h) {
     return h(App)
   },
   data: {
-    message: "Hello Vue",
-    description: "Vue is a frontend build util"
-  }
-});
-console.log(app);
+    message: 'Hello Vue',
+    description: 'Vue is a frontend build util',
+  },
+})
+
+console.log(app)
