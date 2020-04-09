@@ -2,7 +2,7 @@ import Vue from "@s/index.js";
 // import Vue from '@s/lib/vue'
 import App from "./App.vue";
 console.log(App, "?App");
-const app = new Vue({
+/* const app = new Vue({
   el: document.getElementById("app"),
   render: function(createElement) {
     return createElement(
@@ -43,8 +43,8 @@ const app = new Vue({
   mounted() {
     console.log('mounted root vm')
   }
-});
-/* const app = new Vue({
+}); */
+const app = new Vue({
   el: document.getElementById('app'),
   render: function(h) {
     return h(App)
@@ -54,5 +54,5 @@ const app = new Vue({
     description: 'Vue is a frontend build util',
   },
 })
- */
+
 console.log(app);
