@@ -10,6 +10,9 @@ export default {
   name : 'app',
   data() { 
     return {}
+  },
+  mounted() { 
+    console.log('mounted')
   }
 }
 </script>

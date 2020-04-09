@@ -39,6 +39,9 @@ const app = new Vue({
   data: {
     message: "Hello Vue",
     description: "Vue is a frontend build util"
+  },
+  mounted() {
+    console.log('mounted root vm')
   }
 });
 /* const app = new Vue({
