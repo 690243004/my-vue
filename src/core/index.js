@@ -31,6 +31,7 @@ Vue.prototype._init = function(options) {
   vm.isVue = true;
   vm._self = vm;
   if (options._isComponent) {
+    console.log('创建组件了')
     initInternalComponent(vm, options);
   } else {
     // 子组件并不走这里 就显得很奇怪
@@ -42,7 +43,6 @@ Vue.prototype._init = function(options) {
       vm
     );
   }
-
   vm.data = vm._data = vm.$options.data;
   Object.keys(vm.data).forEach(key => {
     initProxy(vm, key);

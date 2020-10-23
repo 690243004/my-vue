@@ -1,14 +1,5 @@
-// import Vue from './core'
-// import './core/expand/mount'
-// import './core/expand/render'
-// import './core/expand/patch'
-// import './core/expand/update'
-// import './core/expand/extend'
-// export default Vue
-
-import { isUndef, isDef } from "./utils";
+import { isUndef, isDef, normalizeArrayChildren } from "./utils";
 import VNode from "./utils/vnode";
-import DOM from './utils/dom'
 // 全局累加
 let uid = 0;
 // 全局 记录当前即将patch的vm实例
@@ -25,6 +16,7 @@ class Vue {
 
   // 入口函数
   _init(options) {
+    console.log('执行了')
     if (options._isComponent) {
       // 非根组件
       this._options = { data: {} };
@@ -40,13 +32,13 @@ class Vue {
     } else {
       // 是根组件
       this._options = {
-        ...options
+        ...this.options
       };
     }
     this.data = this._data = this._options.data;
     // 如果指定了父节点，则挂载
     if (this._options.el) {
-      this._mount(this._options.el);
+      this.$mount(this._options.el);
     }
   }
 
@@ -68,24 +60,20 @@ class Vue {
   _update() {
     const preActiveInstance = activeInstance;
     activeInstance = this;
-    this._patch();
+    this.$el = this._patch();
     activeInstance = preActiveInstance;
   }
 
   // 4. 将vnode 渲染为 真实DOM
-  _patch(vnode) {
+  _patch() {
     if (isUndef(this._vnode)) {
       if (isDef(this._prevVNode)) {
         // TODO desctory _preVNode hook
         return;
       }
     }
-    if (!this._prevVNode) {
-      console.log('el',this._el)
+    if (isUndef(this._prevVNode)) {
       // ...
-      this._el = DOM.createRealDOM(this._vnode,this._el)
-    } else { 
-      this._el =  DOM.createRealDOM(this._vnode,vnode)
     }
   }
 
@@ -98,6 +86,26 @@ class Vue {
     this._globalComponent[name] = ctr;
   }
 
+  /**
+   * 在render阶段中生成vnode节点 以下是控制反转的参数
+   * @param {string} tag 标签名字
+   * @param { object } data 子节点 props
+   * @param { VNode [] | null } children 子vnode配置
+   */
+  _createVNode(tag, data, children) {
+    let vnode;
+    if (!children) {
+      children = data;
+    }
+    children = normalizeArrayChildren(children);
+    if (typeof tag === "string") {
+      vnode = new VNode(tag, data, children, undefined, undefined, this);
+    } else {
+      // 创建组件
+      vnode = VNode.createComponentVNode(tag, data, children);
+    }
+    return vnode;
+  }
 }
 
 export default function(options) {

@@ -28,7 +28,7 @@ export function _createElement(context,tag,data,children) {
     // __proto__: Object
     let Ctor = tag 
     vnode = createComponent(Ctor,context)
-    console.log(vnode,"创建组件节点")
+    console.log(vnode,"组件节点的vnode")
   } 
 
   if(Array.isArray(vnode)) { 
