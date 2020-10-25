@@ -1,10 +1,20 @@
-import { normalizeChildren } from './index';
-import { activeInstance } from '../vue'
-
+import { normalizeChildren } from "./index";
+import { activeInstance, Vue } from "../index";
+import { extractPropsFromVNodeData } from "./vm";
 // 全局累加 渲染组件次数
 let cid = 0;
 export default class VNode {
-  constructor(tag, data, children, text, elm, context,componentOptions,key, parent) {
+  constructor({
+    tag,
+    data,
+    children,
+    text,
+    elm,
+    context,
+    componentOptions,
+    key,
+    parent,
+  }) {
     this.tag = tag;
     this.data = data;
     this.children = children;
@@ -26,61 +36,78 @@ export default class VNode {
     const Ctor = function(options) {
       this._init(options);
     };
-    Ctor.prototype = this.prototype;
+    Ctor.prototype = Object.create(Vue.prototype);
+    Ctor.prototype.constructor = Ctor;
     Ctor.cid = cid++;
     Ctor.options = config;
+    Ctor.render = config.render;
     const name = config.name;
     if (name) {
       // 往自己身上注册自己，以便自己引用自己
       Ctor.options.name = Ctor;
     }
-    // 注入组件patch时执行的周期函数
-    data.hook.init = function(vnode) {
-      const options = {
-        _isComponent : true,
-        _parentVNode : vnode,
-        parent : activeInstance,
-        ...vnode.componentOptions,
-        render :  vnode.componentOptions.Ctor.render,
-      }
-      return new vnode.componentOptions.Ctor(options)
-    }
 
-    return new VNode(
-      `vue-component-${Ctor.cid}-${name}`,
-      data,
-      undefined,
-      undefined,
-      undefined,
-      this,
-      {
+    data = data || {};
+    // 注入组件patch时执行的周期函数
+    data.hook = {
+      init(vnode) {
+        const options = {
+          _isComponent: true,
+          _parentVNode: vnode,
+          parent: activeInstance,
+          componentOptions: vnode.componentOptions,
+          render: vnode.componentOptions.Ctor.render,
+          beforeCreate: vnode.componentOptions.Ctor.options.beforeCreate,
+          created: vnode.componentOptions.Ctor.options.created,
+          mounted: vnode.componentOptions.Ctor.options.mounted,
+          beforeMount: vnode.componentOptions.Ctor.options.beforeMount,
+          beforeDestory: vnode.componentOptions.Ctor.options.beforeDestory,
+          destoryed: vnode.componentOptions.Ctor.options.destoryed,
+        };
+        const vm = new vnode.componentOptions.Ctor(options);
+        vnode.componentInstance = vm;
+        vm._mount();
+      },
+    };
+
+    return new VNode({
+      tag: `vue-component-${Ctor.cid}-${name}`,
+      data: data,
+      context: this,
+      componentOptions: {
         Ctor,
         data,
-        propsData: extractPropsFromVNodeData(data, config),
-        children
-      }
-    );
+        propsData: extractPropsFromVNodeData(data, Ctor),
+        children,
+      },
+    });
   }
 
-  static createVNode(tag,data,children) { 
-    console.log(tag,data,children)
+  static createVNode(tag, data, children) {
     let vnode;
     // 多态处理
-    if(!children) {
-      children = data 
+    if (!children) {
+      children = data;
     }
     children = normalizeChildren(children);
     if (typeof tag === "string") {
-      // 创建普通vnode 
-      vnode = new VNode(tag, data, children, undefined, undefined, this);
+      // 创建普通vnode
+      vnode = new VNode({
+        tag: tag,
+        data: data,
+        children: children,
+        context: this,
+      });
     } else {
-      // 创建组件类型vnode 
+      // 创建组件类型vnode
       vnode = VNode.createComponentVNode(tag, data, children);
     }
-    return vnode
+    return vnode;
   }
 
-  static createTextVNode(val) { 
-    return new VNode(undefined, undefined, undefined, String(val))
+  static createTextVNode(val) {
+    return new VNode({
+      text: String(val),
+    });
   }
 }

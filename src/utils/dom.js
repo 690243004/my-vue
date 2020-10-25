@@ -1,6 +1,18 @@
 import { isDef } from "./index";
 import get from "lodash/get";
 class DOM {
+  static createComponent(vnode, parentElm) {
+    const init = get(vnode, "data.hook.init", function() {});
+    // 执行 Ctor
+    init(vnode);
+    console.log(vnode.componentInstance, "vnode.componentInstance");
+    if (vnode.componentInstance) {
+      vnode.elm = vnode.componentInstance._el;
+      DOM.insert(parentElm, vnode.elm);
+    }
+    return true;
+  }
+
   /**
    * 将vnode渲染为真是DOM 并返回
    * @param {*} vnode
@@ -8,10 +20,10 @@ class DOM {
    */
   static createRealDOM(vnode, parentElm) {
     const { tag, data, children } = vnode;
-
-    if (vnode.componentInstance) {
+    console.log(vnode, "vnode");
+    if (vnode.componentOptions) {
       // 初始化组件
-      return createComponent(vnode, parentElm);
+      return DOM.createComponent(vnode, parentElm);
     }
 
     // TODO put data a slotScopes
@@ -20,7 +32,7 @@ class DOM {
       vnode.elm = DOM.createElement(tag);
       // 深度优先搜索创建子真实DOM
       if (children && children.length) {
-        children.forEach(child => {
+        children.forEach((child) => {
           DOM.createRealDOM(child, vnode.elm);
         });
       }
@@ -28,9 +40,9 @@ class DOM {
       vnode.elm = DOM.createTextNode(vnode.text);
     }
     if (isDef(parentElm)) {
- 
       DOM.insert(parentElm, vnode.elm);
     }
+    return vnode.elm;
   }
 
   static createTextNode(text) {
@@ -39,17 +51,6 @@ class DOM {
 
   static createElement(tag) {
     return document.createElement(tag);
-  }
-
-  static createComponent(vnode, parentElm) {
-    const init = get(vnode, "data.hook.init", function() {});
-    // 执行 Ctor
-    init();
-    if (vnode.componentInstance) {
-      vnode.elm = vnode.componentInstance.$el;
-      DOM.insert(parentElm, vnode.elm);
-    }
-    return true;
   }
 
   static insert(parent, elm) {
@@ -64,4 +65,4 @@ class DOM {
   }
 }
 
-export default DOM
+export default DOM;

@@ -17,7 +17,7 @@ const builtInComponents = {};
 // 初始Vue这个构造函数的option
 function initGlobalAPI(Vue) {
   Vue.options = Object.create(null);
-  ASSET_TYPES.forEach(type => {
+  ASSET_TYPES.forEach((type) => {
     Vue.options[type + "s"] = Object.create(null);
   });
   // 将内置组件合并到components中
@@ -31,7 +31,7 @@ Vue.prototype._init = function(options) {
   vm.isVue = true;
   vm._self = vm;
   if (options._isComponent) {
-    console.log('创建组件了')
+    console.log("创建组件了");
     initInternalComponent(vm, options);
   } else {
     // 子组件并不走这里 就显得很奇怪
@@ -44,13 +44,13 @@ Vue.prototype._init = function(options) {
     );
   }
   vm.data = vm._data = vm.$options.data;
-  Object.keys(vm.data).forEach(key => {
+  Object.keys(vm.data).forEach((key) => {
     initProxy(vm, key);
   });
   vm._renderProxy = vm;
 
   if (vm.$options.el) {
-    // 将节点挂载到dom上
+    // 将节点挂载到dom上 子组件不走这一步，而是在init后，手动触发mount
     vm.$mount(vm.$options.el);
   }
   return this;
