@@ -1,16 +1,19 @@
 import Dep from "./dep";
 let uid = 0;
 export default class Watcher {
-  constructor({ vm, keyStr, callback }) {
+  constructor({ vm, keyStr, callback, isRenderWatcher }) {
     this.vm = vm;
     this._callback = callback;
     this.vm._watchers.push(this);
     this.deps = [];
     this.depIds = new Set();
     this.keyStr = keyStr;
-    this.value = this.get();
     this.id = uid++;
+    this.value = this.get();
     this._callback.call(this.vm);
+    if (isRenderWatcher) {
+      this.vm._watcher = this;
+    }
   }
 
   udpate() {
@@ -27,11 +30,13 @@ export default class Watcher {
   }
 
   get() {
-    let value;
-    Dep.target = this;
-    this.keyStr.split(".").forEach((key) => (value = this.vm[key]));
-    Dep.target = null;
-    return value;
+    try {
+      let value;
+      Dep.target = this;
+      this.keyStr.split(".").forEach((key) => (value = this.vm[key]));
+      Dep.target = null;
+      return value;
+    } catch (e) {}
   }
 
   run() {

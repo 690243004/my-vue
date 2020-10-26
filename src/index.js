@@ -30,6 +30,7 @@ export class Vue {
     this._el = null; // 对应vnode的真实DOM节点，会在patch之后赋值
     this._hooks = null; // 钩子存放处
     this._watchers = null;
+    this._watcher = null;
   }
 
   // 入口函数
@@ -66,8 +67,15 @@ export class Vue {
   _mount(el) {
     this._callHook("beforeMount");
     this._el = el;
-    this._render();
-    this._update();
+    const updateComponent = () => {
+      this._render();
+      this._update();
+    };
+    new Watcher({
+      vm: this,
+      callback: updateComponent,
+      isRenderWatcher: true,
+    });
     this._callHook("mounted");
   }
 
@@ -97,7 +105,6 @@ export class Vue {
     if (!this._prevVNode) {
       // 初次渲染
       this._el = DOM.createRealDOM(this._vnode, this._el);
-      console.log(this._el, "break shink");
     } else {
       // TODO 更新节点
       this._el = DOM.createRealDOM(this._vnode, vnode);
@@ -122,7 +129,6 @@ export class Vue {
 
   _callHook(type) {
     const handlers = this._hooks[type + "s"];
-    console.log(type + "s", handlers, "handlers");
     handlers.forEach((fn) => fn.call(this));
   }
 
