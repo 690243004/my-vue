@@ -41,9 +41,8 @@ export class Vue {
       // 非根组件
       this._options = {
         ...options,
-        data: {},
         parent: options.parent, // 即activeInstance
-        _parentNode: options.parentNode,
+        _parentVNode: options._parentVNode,
         propsData: options.componentOptions.propsData,
         _parentListeners: options.componentOptions._parentListeners,
         _renderChildren: options.componentOptions.children,
@@ -68,6 +67,7 @@ export class Vue {
     this._callHook("beforeMount");
     this._el = el;
     const updateComponent = () => {
+      console.log("触发了重新更新");
       this._render();
       this._update();
     };
@@ -84,6 +84,9 @@ export class Vue {
     this._prevVNode = this._vnode;
     // 通过传递风格的编程，在render函数中通过控制反转生成vnode节点
     this._vnode = this._options.render.call(this, VNode.createVNode.bind(this));
+    // 设置 parent
+    console.log(this._options, "设置Parent");
+    this._vnode.parent = this._options._parentVNode;
   }
 
   // 3. 更新
@@ -95,7 +98,7 @@ export class Vue {
   }
 
   // 4. 将vnode 渲染为 真实DOM
-  _patch(vnode) {
+  _patch() {
     if (isUndef(this._vnode)) {
       if (isDef(this._prevVNode)) {
         // TODO desctory _preVNode hook
@@ -107,7 +110,8 @@ export class Vue {
       this._el = DOM.createRealDOM(this._vnode, this._el);
     } else {
       // TODO 更新节点
-      this._el = DOM.createRealDOM(this._vnode, vnode);
+      console.log(this._prevVNode, "preNode");
+      this._el = DOM.createRealDOM(this._vnode, this._prevVNode);
     }
   }
 
@@ -181,9 +185,11 @@ export class Vue {
     this._dep = new Dep();
     this._proxy = new Proxy(this, {
       get(context, key) {
+        console.log("来了么", key, Dep.target);
         // 收集依赖
-        if (Dep.taget) {
-          context._dep.addSub();
+        if (Dep.target) {
+          console.log(context._dep, "收集依赖呢");
+          context._dep.addSub(Dep.target);
         }
         if (context._props[key]) {
           return context._props[key];
@@ -201,7 +207,8 @@ export class Vue {
         }
         if (context._data[key]) {
           context._data[key] = value;
-          this._dep.notify();
+          context._dep.notify();
+          return true;
         }
       },
     });

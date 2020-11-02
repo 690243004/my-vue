@@ -63,6 +63,8 @@ export default class VNode {
           beforeMount: vnode.componentOptions.Ctor.options.beforeMount,
           beforeDestory: vnode.componentOptions.Ctor.options.beforeDestory,
           destoryed: vnode.componentOptions.Ctor.options.destoryed,
+          data: vnode.componentOptions.Ctor.options.data,
+          methods: vnode.componentOptions.Ctor.options.methods,
         };
         const vm = new vnode.componentOptions.Ctor(options);
         vnode.componentInstance = vm;

@@ -4,6 +4,7 @@ class Dep {
   }
 
   addSub(sub) {
+    console.log(sub, "sub");
     this.subs.push(sub);
   }
 

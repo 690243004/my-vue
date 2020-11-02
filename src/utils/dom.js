@@ -20,7 +20,6 @@ class DOM {
    */
   static createRealDOM(vnode, parentElm) {
     const { tag, data, children } = vnode;
-    console.log(vnode, "vnode");
     if (vnode.componentOptions) {
       // 初始化组件
       return DOM.createComponent(vnode, parentElm);
@@ -40,7 +39,21 @@ class DOM {
       vnode.elm = DOM.createTextNode(vnode.text);
     }
     if (isDef(parentElm)) {
-      DOM.insert(parentElm, vnode.elm);
+      if (parentElm.nodeType) {
+        DOM.insert(parentElm, vnode.elm);
+      } else {
+        // update Nodes
+        const preVNode = parentElm;
+        if (vnode.key == preVNode.key) {
+          // 创建新节点
+          const componnentVNode = vnode.parent;
+          // 更新占位节点 执行卸载函数
+
+          // 删除旧节点
+        } else {
+          // 获取children 执行diff
+        }
+      }
     }
     return vnode.elm;
   }

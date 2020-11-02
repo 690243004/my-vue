@@ -5,6 +5,7 @@ export default class Watcher {
     this.vm = vm;
     this._callback = callback;
     this.vm._watchers.push(this);
+    this.isRenderWatcher = isRenderWatcher;
     this.deps = [];
     this.depIds = new Set();
     this.keyStr = keyStr;
@@ -16,8 +17,12 @@ export default class Watcher {
     }
   }
 
-  udpate() {
-    this.run();
+  update() {
+    if (this.isRenderWatcher) {
+      this._callback.call(this.vm);
+    } else {
+      this.run();
+    }
   }
 
   run() {
